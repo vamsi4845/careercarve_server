@@ -1,0 +1,50 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mongodb"
+  url      = env("DATABASE_URL")
+}
+
+model Mentor {
+  id               String    @id @default(auto()) @map("_id") @db.ObjectId
+  name             String
+  yoe              Int       // Years of Experience
+  areasOfExpertise String[]
+  companies        String[]
+  schedules        Schedule[]
+  payments         Payment[]
+  availabilities   Json[]
+  preferredBy      Student[] @relation("MentorToStudent")
+}
+
+model Student {
+  id               String    @id @default(auto()) @map("_id") @db.ObjectId
+  name             String
+  areaOfInterest   String
+  preferredMentor  Mentor?   @relation("MentorToStudent", fields: [preferredMentorId], references: [id])
+  preferredMentorId String?  @db.ObjectId
+  schedules        Schedule[]
+  payments         Payment[]
+}
+
+model Schedule {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  startTime DateTime
+  endTime   DateTime
+  student   Student  @relation(fields: [studentId], references: [id])
+  studentId String   @db.ObjectId
+  mentor    Mentor   @relation(fields: [mentorId], references: [id])
+  mentorId  String   @db.ObjectId
+}
+
+model Payment {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  amount    Int
+  duration  Int
+  student   Student  @relation(fields: [studentId], references: [id])
+  studentId String   @db.ObjectId
+  mentor    Mentor   @relation(fields: [mentorId], references: [id])
+  mentorId  String   @db.ObjectId
+}
