@@ -1,5 +1,5 @@
 import { PrismaClient } from '@prisma/client';
-import { Router } from 'express';
+import e, { Router } from 'express';
 
 const prisma = new PrismaClient();
 
@@ -78,3 +78,5 @@ router.delete('/:studentId', async (req, res) => {
     res.status(500).json({ error: 'Internal Server Error' });
   }
 });
+
+export default router;

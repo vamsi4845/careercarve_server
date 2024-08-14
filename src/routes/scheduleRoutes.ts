@@ -4,7 +4,7 @@ import { PrismaClient } from '@prisma/client';
 const prisma = new PrismaClient();
 const router = Router();
 
-router.post('/schedule', async (req, res) => {
+router.post('/', async (req, res) => {
   try {
     const { date, timeSlot, email, mentorId, name, duration } = req.body;
 
@@ -30,7 +30,7 @@ router.post('/schedule', async (req, res) => {
 });
 
 // Get all schedules
-router.get('/schedule', async (req, res) => {
+router.get('/', async (req, res) => {
   try {
     const schedules = await prisma.schedule.findMany({
       include: { mentor: true },
@@ -43,7 +43,7 @@ router.get('/schedule', async (req, res) => {
 });
 
 // Get schedule by ID
-router.get('/schedule/:scheduleId', async (req, res) => {
+router.get('/:scheduleId', async (req, res) => {
   const { scheduleId } = req.params;
   try {
     const schedule = await prisma.schedule.findUnique({
@@ -62,7 +62,7 @@ router.get('/schedule/:scheduleId', async (req, res) => {
 });
 
 // Update schedule
-router.put('/schedule/:scheduleId', async (req, res) => {
+router.put('/:scheduleId', async (req, res) => {
   const { scheduleId } = req.params;
   const { date, timeSlot, email, mentorId, name, duration } = req.body;
   try {
