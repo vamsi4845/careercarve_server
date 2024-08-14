@@ -1,5 +1,6 @@
 import { Router } from 'express';
 import { PrismaClient } from '@prisma/client';
+import { sendScheduleConfirmationEmail, ScheduleEmailData } from '../emailService';
 
 const prisma = new PrismaClient();
 const router = Router();
@@ -31,9 +32,30 @@ router.post('/', async (req, res) => {
         mentorId,
         duration,
       },
+      include: {
+        mentor: {
+          select: { name: true }
+        }
+      }
     });
 
-    res.status(201).json(newSchedule);
+    // Prepare email data
+    const emailData: ScheduleEmailData = {
+      studentName: name,
+      studentEmail: email,
+      mentorName: newSchedule.mentor.name,
+      date,
+      startTime: timeSlot,
+      duration
+    };
+
+    // Send confirmation email
+    await sendScheduleConfirmationEmail(emailData);
+
+    res.status(201).json({
+      message: "Schedule confirmed. Please check your email for more details.",
+      schedule: newSchedule
+    });
   } catch (error) {
     console.error('Error creating schedule:', error);
     res.status(500).json({ error: 'Failed to create schedule' });

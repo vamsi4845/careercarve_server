@@ -6,7 +6,7 @@
   "scripts": {
     "start": "ts-node src/index.ts",
     "test": "echo \"Error: no test specified\" && exit 1",
-    "build":"npm install && tsc"
+    "build": "npm install && tsc"
   },
   "keywords": [],
   "author": "",
@@ -17,10 +17,12 @@
     "body-parser": "^1.20.2",
     "cors": "^2.8.5",
     "express": "^4.19.2",
+    "nodemailer": "^6.9.14",
     "prisma": "^5.18.0"
   },
   "devDependencies": {
     "@types/node": "^22.3.0",
+    "@types/nodemailer": "^6.4.15",
     "ts-node": "^10.9.2",
     "typescript": "^5.5.4"
   }
