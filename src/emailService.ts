@@ -40,6 +40,7 @@ export async function sendScheduleConfirmationEmail(data: ScheduleEmailData) {
       <p>Please review these details carefully. If you need to make any changes or have any questions, please contact us immediately.</p>
       <p>We recommend adding this session to your calendar to ensure you don't miss it.</p>
       <p>Best regards,<br>Your Mentorship Team</p>
+      <p>Visit our website: <Link href="https://www.careercarve.com/">https://www.careercarve.com</a></p>
     `,
   };
 
