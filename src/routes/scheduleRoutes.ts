@@ -8,6 +8,17 @@ router.post('/', async (req, res) => {
   try {
     const { date, timeSlot, email, mentorId, name, duration } = req.body;
 
+    // Validate inputs
+    if (!date || !timeSlot || !email || !mentorId || !name || !duration) {
+      return res.status(400).json({ error: 'Missing required fields' });
+    }
+
+    // Validate date and timeSlot format
+    if (!isValidDate(date) || !isValidTimeSlot(timeSlot)) {
+      console.log(`Invalid date or time slot format: ${date} ${timeSlot}`);
+      return res.status(400).json({ error: 'Invalid date or time slot format' });
+    }
+
     const startTime = new Date(`${date}T${timeSlot}`);
     const endTime = new Date(startTime.getTime() + duration * 60000);
 
@@ -28,6 +39,17 @@ router.post('/', async (req, res) => {
     res.status(500).json({ error: 'Failed to create schedule' });
   }
 });
+
+// Helper functions for validation
+function isValidDate(dateString: string): boolean {
+  const regex = /^\d{4}-\d{2}-\d{2}$/;
+  return regex.test(dateString) && !isNaN(Date.parse(dateString));
+}
+
+function isValidTimeSlot(timeSlot: string): boolean {
+  const regex = /^([01]\d|2[0-3]):([0-5]\d):([0-5]\d)$/;
+  return regex.test(timeSlot);
+}
 
 // Get all schedules
 router.get('/', async (req, res) => {

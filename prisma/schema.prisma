@@ -32,8 +32,8 @@ model Schedule {
   id        String   @id @default(auto()) @map("_id") @db.ObjectId
   startTime DateTime
   endTime   DateTime
-  studentName String
-  studentEmail String
+  studentName String?
+  studentEmail String?
   mentor    Mentor   @relation(fields: [mentorId], references: [id])
   mentorId  String   @db.ObjectId
   duration  Int
