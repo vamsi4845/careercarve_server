@@ -4,76 +4,99 @@ import { PrismaClient } from '@prisma/client';
 const prisma = new PrismaClient();
 const router = Router();
 
-// Get all students
-router.get('/', async (req, res) => {
+router.post('/schedule', async (req, res) => {
   try {
-    const students = await prisma.student.findMany();
-    res.json(students);
-  } catch (error) {
-    res.status(500).json({ error: 'Internal Server Error' });
-  }
-});
+    const { date, timeSlot, email, mentorId, name, duration } = req.body;
 
-// Create a new student
-router.post('/', async (req, res) => {
-  const { name, areaOfInterest } = req.body;
-  try {
-    const student = await prisma.student.create({
+    const startTime = new Date(`${date}T${timeSlot}`);
+    const endTime = new Date(startTime.getTime() + duration * 60000);
+
+    const newSchedule = await prisma.schedule.create({
       data: {
-        name,
-        areaOfInterest,
+        startTime,
+        endTime,
+        studentName: name,
+        studentEmail: email,
+        mentorId,
+        duration,
       },
     });
-    res.json(student);
+
+    res.status(201).json(newSchedule);
   } catch (error) {
+    console.error('Error creating schedule:', error);
+    res.status(500).json({ error: 'Failed to create schedule' });
+  }
+});
+
+// Get all schedules
+router.get('/schedule', async (req, res) => {
+  try {
+    const schedules = await prisma.schedule.findMany({
+      include: { mentor: true },
+    });
+    res.json(schedules);
+  } catch (error) {
+    console.error('Error fetching schedules:', error);
     res.status(500).json({ error: 'Internal Server Error' });
   }
 });
 
-// Get student by ID
-router.get('/:studentId', async (req, res) => {
-  const { studentId } = req.params;
+// Get schedule by ID
+router.get('/schedule/:scheduleId', async (req, res) => {
+  const { scheduleId } = req.params;
   try {
-    const student = await prisma.student.findUnique({
-      where: { id: studentId },
+    const schedule = await prisma.schedule.findUnique({
+      where: { id: scheduleId },
+      include: { mentor: true },
     });
-    if (student) {
-      res.json(student);
+    if (schedule) {
+      res.json(schedule);
     } else {
-      res.status(404).json({ error: 'Student not found' });
+      res.status(404).json({ error: 'Schedule not found' });
     }
   } catch (error) {
+    console.error('Error fetching schedule:', error);
     res.status(500).json({ error: 'Internal Server Error' });
   }
 });
 
-// Update student details
-router.put('/:studentId', async (req, res) => {
-  const { studentId } = req.params;
-  const { name, areaOfInterest } = req.body;
+// Update schedule
+router.put('/schedule/:scheduleId', async (req, res) => {
+  const { scheduleId } = req.params;
+  const { date, timeSlot, email, mentorId, name, duration } = req.body;
   try {
-    const student = await prisma.student.update({
-      where: { id: studentId },
+    const startTime = new Date(`${date}T${timeSlot}`);
+    const endTime = new Date(startTime.getTime() + duration * 60000);
+
+    const updatedSchedule = await prisma.schedule.update({
+      where: { id: scheduleId },
       data: {
-        name,
-        areaOfInterest,
+        startTime,
+        endTime,
+        studentName: name,
+        studentEmail: email,
+        mentorId,
+        duration,
       },
     });
-    res.json(student);
+    res.json(updatedSchedule);
   } catch (error) {
+    console.error('Error updating schedule:', error);
     res.status(500).json({ error: 'Internal Server Error' });
   }
 });
 
-// Delete a student by ID
-router.delete('/:studentId', async (req, res) => {
-  const { studentId } = req.params;
+// Delete a schedule by ID
+router.delete('/schedule/:scheduleId', async (req, res) => {
+  const { scheduleId } = req.params;
   try {
-    await prisma.student.delete({
-      where: { id: studentId },
+    await prisma.schedule.delete({
+      where: { id: scheduleId },
     });
     res.status(204).send();
   } catch (error) {
+    console.error('Error deleting schedule:', error);
     res.status(500).json({ error: 'Internal Server Error' });
   }
 });

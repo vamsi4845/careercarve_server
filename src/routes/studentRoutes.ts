@@ -1,94 +1,80 @@
-import { Router } from 'express';
 import { PrismaClient } from '@prisma/client';
+import { Router } from 'express';
 
 const prisma = new PrismaClient();
+
 const router = Router();
 
-// Get all payments
+// / Get all students
 router.get('/', async (req, res) => {
   try {
-    const payments = await prisma.payment.findMany({
-      include: {
-        student: true,
-        mentor: true,
-      },
-    });
-    res.json(payments);
+    const students = await prisma.student.findMany();
+    res.json(students);
   } catch (error) {
     res.status(500).json({ error: 'Internal Server Error' });
   }
 });
 
-// Create a new payment
+// Create a new student
 router.post('/', async (req, res) => {
-  const { amount, duration, studentId, mentorId } = req.body;
+  const { name, areaOfInterest } = req.body;
   try {
-    const payment = await prisma.payment.create({
+    const student = await prisma.student.create({
       data: {
-        amount,
-        duration,
-        student: { connect: { id: studentId } },
-        mentor: { connect: { id: mentorId } },
+        name,
+        areaOfInterest,
       },
     });
-    res.json(payment);
+    res.json(student);
   } catch (error) {
     res.status(500).json({ error: 'Internal Server Error' });
   }
 });
 
-// Get payment by ID
-router.get('/:paymentId', async (req, res) => {
-  const { paymentId } = req.params;
+// Get student by ID
+router.get('/:studentId', async (req, res) => {
+  const { studentId } = req.params;
   try {
-    const payment = await prisma.payment.findUnique({
-      where: { id: paymentId },
-      include: {
-        student: true,
-        mentor: true,
-      },
+    const student = await prisma.student.findUnique({
+      where: { id: studentId },
     });
-    if (payment) {
-      res.json(payment);
+    if (student) {
+      res.json(student);
     } else {
-      res.status(404).json({ error: 'Payment not found' });
+      res.status(404).json({ error: 'Student not found' });
     }
   } catch (error) {
     res.status(500).json({ error: 'Internal Server Error' });
   }
 });
 
-// Update a payment
-router.put('/:paymentId', async (req, res) => {
-  const { paymentId } = req.params;
-  const { amount, duration, studentId, mentorId } = req.body;
+// Update student details
+router.put('/:studentId', async (req, res) => {
+  const { studentId } = req.params;
+  const { name, areaOfInterest } = req.body;
   try {
-    const payment = await prisma.payment.update({
-      where: { id: paymentId },
+    const student = await prisma.student.update({
+      where: { id: studentId },
       data: {
-        amount,
-        duration,
-        student: { connect: { id: studentId } },
-        mentor: { connect: { id: mentorId } },
+        name,
+        areaOfInterest,
       },
     });
-    res.json(payment);
+    res.json(student);
   } catch (error) {
     res.status(500).json({ error: 'Internal Server Error' });
   }
 });
 
-// Delete a payment
-router.delete('/:paymentId', async (req, res) => {
-  const { paymentId } = req.params;
+// Delete a student by ID
+router.delete('/:studentId', async (req, res) => {
+  const { studentId } = req.params;
   try {
-    await prisma.payment.delete({
-      where: { id: paymentId },
+    await prisma.student.delete({
+      where: { id: studentId },
     });
     res.status(204).send();
   } catch (error) {
     res.status(500).json({ error: 'Internal Server Error' });
   }
 });
-
-export default router;

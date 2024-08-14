@@ -25,7 +25,6 @@ model Student {
   areaOfInterest   String
   preferredMentor  Mentor?   @relation("MentorToStudent", fields: [preferredMentorId], references: [id])
   preferredMentorId String?  @db.ObjectId
-  schedules        Schedule[]
   payments         Payment[]
 }
 
@@ -33,10 +32,11 @@ model Schedule {
   id        String   @id @default(auto()) @map("_id") @db.ObjectId
   startTime DateTime
   endTime   DateTime
-  student   Student  @relation(fields: [studentId], references: [id])
-  studentId String   @db.ObjectId
+  studentName String
+  studentEmail String
   mentor    Mentor   @relation(fields: [mentorId], references: [id])
   mentorId  String   @db.ObjectId
+  duration  Int
 }
 
 model Payment {
