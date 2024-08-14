@@ -8,6 +8,11 @@ const app = express();
 app.use(express.json());
 app.use(cors());
 
+app.get('/ping', (req, res) => {
+  res.status(200).json({ status: 'OK', message: 'Server is alive' });
+});
+
+
 app.use('/students', studentRoutes);
 app.use('/mentors', mentorRoutes);
 app.use('/schedules', scheduleRoutes);
