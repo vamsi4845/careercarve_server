@@ -1,4 +1,14 @@
 import nodemailer from 'nodemailer';
+import dotenv from 'dotenv';
+
+// Load environment variables
+dotenv.config();
+
+// Check if email credentials are set
+if (!process.env.EMAIL_USER || !process.env.EMAIL_PASS) {
+  console.error('EMAIL_USER or EMAIL_PASS environment variables are not set');
+  process.exit(1);
+}
 
 // Create a transporter using SMTP
 const transporter = nodemailer.createTransport({
@@ -45,9 +55,16 @@ export async function sendScheduleConfirmationEmail(data: ScheduleEmailData) {
   };
 
   try {
-    await transporter.sendMail(mailOptions);
-    console.log('Schedule confirmation email sent successfully');
+    console.log('Attempting to send email...');
+    const info = await transporter.sendMail(mailOptions);
+    console.log('Schedule confirmation email sent successfully', info);
   } catch (error) {
     console.error('Error sending schedule confirmation email:', error);
+    // Log more details about the error
+    if (error instanceof Error) {
+      console.error('Error name:', error.name);
+      console.error('Error message:', error.message);
+      console.error('Error stack:', error.stack);
+    }
   }
 }
