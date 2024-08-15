@@ -1,6 +1,7 @@
 import { Router } from 'express';
 import { PrismaClient } from '@prisma/client';
 import { sendScheduleConfirmationEmail, ScheduleEmailData } from '../emailService';
+import { Schedule } from '../types';
 
 const prisma = new PrismaClient();
 const router = Router();
@@ -33,11 +34,9 @@ router.post('/', async (req, res) => {
         duration,
       },
       include: {
-        mentor: {
-          select: { name: true }
-        }
+        mentor: true
       }
-    });
+    }) as unknown as Schedule;
 
     // Prepare email data
     const emailData: ScheduleEmailData = {
@@ -142,6 +141,35 @@ router.delete('/schedule/:scheduleId', async (req, res) => {
   } catch (error) {
     console.error('Error deleting schedule:', error);
     res.status(500).json({ error: 'Internal Server Error' });
+  }
+});
+
+// Update the route to fetch schedules by email
+router.get('/by-email/:email', async (req, res) => {
+  try {
+    const { email } = req.params;
+
+    // Validate email
+    if (!email || typeof email !== 'string') {
+      return res.status(400).json({ error: 'Valid user email is required' });
+    }
+
+    // Fetch schedules for the student
+    const schedules = await prisma.schedule.findMany({
+      where: { studentEmail: email },
+      include: { mentor: true },
+    });
+
+    if (schedules.length === 0) {
+      return res.status(404).json({ error: 'No schedules found for this email' });
+    }
+
+    res.status(200).json({
+      schedules,
+    });
+  } catch (error) {
+    console.error('Error fetching schedules:', error);
+    res.status(500).json({ error: 'Failed to fetch schedules' });
   }
 });
 

@@ -55,9 +55,8 @@ export async function sendScheduleConfirmationEmail(data: ScheduleEmailData) {
   };
 
   try {
-    console.log('Attempting to send email...');
     const info = await transporter.sendMail(mailOptions);
-    console.log('Schedule confirmation email sent successfully', info);
+    console.log('Schedule confirmation email sent successfully');
   } catch (error) {
     console.error('Error sending schedule confirmation email:', error);
     // Log more details about the error
